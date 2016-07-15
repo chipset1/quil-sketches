@@ -32,7 +32,7 @@
                        (apply q/random r-args1))
                     (+ (v/y v)
                        (apply q/random r-args2))]))
-       vd) )
+       vd))
 
 (defn glitch1 [image]
   (q/tint 255 200)
