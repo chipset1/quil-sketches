@@ -3,9 +3,10 @@
             [quil-sketches.util.core :as u]
             [quil-sketches.vector :as v]
             [quil.middleware :as m]))
-;1500, 1131
-(def width 1500)
-(def height 1131)
+
+;image dimensions 1500, 1131
+(def width 500)
+(def height 500)
 
 (defn vertex-data
   [x y w h]
@@ -71,14 +72,13 @@
        (map (partial random-uv [20 30] [20 30]))
        (remove (partial u/chance? 0.2))
        (map (partial apply-vertexs image))
-       doall)
-  )
+       doall))
 
 (defn draw []
   (let [image (q/load-image "images/vD07h30.jpg")]
     #_(glitch1 image)
     (glitch2 image)
-    #_(q/save-frame "output/glitch-####.gif")
+    #_(q/save-frame "scratch-output/glitch-####.gif")
     ))
 
 (q/defsketch quil-sketches
