@@ -25,10 +25,11 @@
 
 ;added this so
 (defn random
-  [min max]
-  (if (>= min max)
-    min
-    (+ min (rand (- max min))) ))
+  ([max] (random 0 max))
+  ([min max]
+   (if (>= min max)
+     min
+     (+ min (rand (- max min))))))
 
 (defn random-int
   [min max]
