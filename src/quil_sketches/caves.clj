@@ -151,21 +151,24 @@
                                    birth-limit))
              (rest coords)))))
 
-(generate-map 2 3 3 0.45 2 2)
+(generate-map 1 3 3 0.45 2 2)
 
 (cell-map 3 3 0.45)
 
 (defn generate-map
   [steps width height chance-to-start-alive death-limit birth-limit]
-  (loop [s steps
-         m (sim-step (cell-map width
-                               height
-                               chance-to-start-alive)
-                     width
-                     height
-                     death-limit
-                     birth-limit)]
-    (if (= s 0)
-      m
-      (recur (dec s)
-             (sim-step m width height death-limit birth-limit)))))
+  (let [initial-map (cell-map width
+                              height
+                              chance-to-start-alive)]
+    (println "initial map")
+    (loop [s steps
+           m (sim-step initial-map
+                       width
+                       height
+                       death-limit
+                       birth-limit)]
+      (println "sim map" m)
+      (if (= s 1)
+        m
+        (recur (dec s)
+               (sim-step m width height death-limit birth-limit))))))
