@@ -43,8 +43,11 @@
 
 (defn cell-map
   [width height chance-to-start-alive]
-  (repeatedly height
-              (fn [] (take width (repeatedly #(cell chance-to-start-alive))))))
+  (vec (repeatedly height
+                   (fn [] (->> #(cell chance-to-start-alive)
+                               repeatedly
+                               (take width)
+                               vec)))))
 
 (cell-map 100 100 0.45)
 
@@ -114,8 +117,8 @@
             2)
 
 (let [cell-map [[1 1 0]
-                 [0 0 1]
-                 [1 0 0]]
+                [0 0 1]
+                [1 0 0]]
       death-limit 3
       birth-limit 2]
   (loop [new-cell-map cell-map
@@ -148,11 +151,12 @@
                                    birth-limit))
              (rest coords)))))
 
-(generate-map 1 3 3 0.45 2 2)
+(generate-map 2 3 3 0.45 2 2)
+
+(cell-map 3 3 0.45)
 
 (defn generate-map
   [steps width height chance-to-start-alive death-limit birth-limit]
-
   (loop [s steps
          m (sim-step (cell-map width
                                height
