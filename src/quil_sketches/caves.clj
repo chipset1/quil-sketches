@@ -34,15 +34,17 @@
     1
     0))
 
-(for [cell-x (take 10 (repeatedly #(cell 0.45)))
-      cell-y (take 10 (repeatedly #(cell 0.45)))]
-  [cell-x cell-y])
+(take 10 (repeatedly #(cell 0.45)))
+
+(repeatedly 10
+            (fn [] (take 10 (repeatedly #(cell 0.45)))))
+
+
 
 (defn cell-map
   [width height chance-to-start-alive]
-  (for [cell-x (take width (repeatedly #(cell chance-to-start-alive)))
-        cell-y (take height (repeatedly #(cell chance-to-start-alive)))]
-    [cell-x cell-y]))
+  (repeatedly height
+              (fn [] (take width (repeatedly #(cell chance-to-start-alive))))))
 
 (cell-map 100 100 0.45)
 
@@ -111,19 +113,55 @@
             1
             2)
 
-(let [map1 [[1 1 0]
-            [0 0 1]
-            [1 0 0]]
+(let [cell-map [[1 1 0]
+                 [0 0 1]
+                 [1 0 0]]
       death-limit 3
       birth-limit 2]
-  (loop [new-map map1
+  (loop [new-cell-map cell-map
          coords (u/grid 3 3 1 1)]
     (if (empty? coords)
-      new-map
-      (recur (assoc-in new-map
+      new-cell-map
+      (recur (assoc-in new-cell-map
                        (first coords)
-                       (apply-rule map1
+                       (apply-rule cell-map
                                    (first coords)
                                    death-limit
                                    birth-limit))
              (rest coords)))))
+
+
+(defn sim-step
+  [cell-map width height death-limit birth-limit]
+  (loop [new-cell-map cell-map
+         coords (u/grid width
+                        height
+                        1
+                        1)]
+    (if (empty? coords)
+      new-cell-map
+      (recur (assoc-in new-cell-map
+                       (first coords)
+                       (apply-rule cell-map
+                                   (first coords)
+                                   death-limit
+                                   birth-limit))
+             (rest coords)))))
+
+(generate-map 1 3 3 0.45 2 2)
+
+(defn generate-map
+  [steps width height chance-to-start-alive death-limit birth-limit]
+
+  (loop [s steps
+         m (sim-step (cell-map width
+                               height
+                               chance-to-start-alive)
+                     width
+                     height
+                     death-limit
+                     birth-limit)]
+    (if (= s 0)
+      m
+      (recur (dec s)
+             (sim-step m width height death-limit birth-limit)))))
