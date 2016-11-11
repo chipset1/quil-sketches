@@ -102,18 +102,20 @@
           1
           0))))
 
+
+
 (apply-rule [[1 0 0]
              [0 0 1]
              [1 0 0]]
             [1 1]
-            0
-            1)
+            1
+            2)
 
-(let [map1 [[1 0 0]
+(let [map1 [[1 1 0]
             [0 0 1]
             [1 0 0]]
       death-limit 3
-      birth-limit 4]
+      birth-limit 2]
   (loop [new-map map1
          coords (u/grid 3 3 1 1)]
     (if (empty? coords)
@@ -122,6 +124,6 @@
                        (first coords)
                        (apply-rule map1
                                    (first coords)
-                                   4
-                                   3))
+                                   death-limit
+                                   birth-limit))
              (rest coords)))))
