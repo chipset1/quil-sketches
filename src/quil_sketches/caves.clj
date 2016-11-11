@@ -1,5 +1,7 @@
 (ns quil-sketches.caves
-  (:require [quil-sketches.util.core :as u]))
+  (:require [quil.core :as q]
+            [quil-sketches.util.core :as u]
+            [quil.middleware :as m]))
 
 (def cell-map [[1 0 0]
                [0 0 1]
@@ -160,15 +162,38 @@
   (let [initial-map (cell-map width
                               height
                               chance-to-start-alive)]
-    (println "initial map")
     (loop [s steps
            m (sim-step initial-map
                        width
                        height
                        death-limit
                        birth-limit)]
-      (println "sim map" m)
       (if (= s 1)
         m
         (recur (dec s)
                (sim-step m width height death-limit birth-limit))))))
+
+(def board (generate-map 4 50 50 0.3 3 4))
+
+(defn draw []
+  (let [cell-width 10
+        cell-height 10]
+    (q/background (q/unhex "3355AA"))
+    (doall (map-indexed (fn [i row]
+                          (doall (map-indexed (fn [j cell]
+                                                (when (= cell 1)
+                                                  (q/no-stroke)
+                                                  (q/fill 68,51,51)
+                                                  (q/rect (* i 10)
+                                                          (* j 10)
+                                                          10
+                                                          10)))
+                                              row)))
+                        board))))
+
+
+(q/defsketch quil-sketches
+  :size [500 500]
+  :draw draw
+  :features [:keep-on-top]
+  :middleware [m/pause-on-error])
