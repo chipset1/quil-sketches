@@ -92,10 +92,9 @@
 
 (defn apply-rule
   [cell-map coord death-limit birth-limit]
-  (let [cell (get-in cell-map coords)
+  (let [cell (get-in cell-map coord)
         nbs (count-neighbours cell-map coord)]
-    (println "nbs: "nbs "cell: " cell)
-    (if (= cell 0)
+    (if (= cell 1)
         (if (< nbs death-limit)
           0
           1)
@@ -113,7 +112,8 @@
 (let [map1 [[1 0 0]
             [0 0 1]
             [1 0 0]]
-      death-limit 3]
+      death-limit 3
+      birth-limit 4]
   (loop [new-map map1
          coords (u/grid 3 3 1 1)]
     (if (empty? coords)
@@ -122,6 +122,6 @@
                        (first coords)
                        (apply-rule map1
                                    (first coords)
-                                   0
-                                   1))
+                                   4
+                                   3))
              (rest coords)))))
