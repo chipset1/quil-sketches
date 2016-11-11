@@ -1,4 +1,5 @@
-(ns quil-sketches.caves)
+(ns quil-sketches.caves
+  (:require [quil-sketches.util.core :as u]))
 
 (def cell-map [[1 0 0]
                [0 0 1]
@@ -47,11 +48,80 @@
 
 (neighbours [1 1])
 
-(->> (neighbours [1 1])
+(->> (neighbours [0 1])
      (map #(get-in [[1 0 0]
                     [0 0 1]
                     [1 0 0]]
                    %)))
 
 
-(count-neighbours cell-map [1 1])
+(count-neighbours cell-map [0 1])
+
+(->> (neighbours [0 0])
+     (map #(get-in [[1 0 0]
+                    [0 0 1]
+                    [1 0 0]]
+                    %)))
+
+(->> (neighbours [2 2])
+     (map #(get-in [[1 0 0]
+                    [0 0 1]
+                    [1 0 0]]
+                   %)))
+
+(->> (neighbours [2 2])
+     (map #(get-in [[1 0 0]
+                    [0 0 1]
+                    [1 0 0]]
+                   %))
+     (remove nil?))
+
+(->> (neighbours [2 2])
+     (keep #(get-in [[1 0 0]
+                     [0 0 1]
+                     [1 0 0]]
+                    %)))
+
+(defn count-neighbours
+  [grid coord]
+  (->> (neighbours coord)
+       (keep #(get-in grid %1))
+       (reduce +)))
+
+(count-neighbours cell-map [0 1])
+
+(defn apply-rule
+  [cell-map coord death-limit birth-limit]
+  (let [cell (get-in cell-map coords)
+        nbs (count-neighbours cell-map coord)]
+    (println "nbs: "nbs "cell: " cell)
+    (if (= cell 0)
+        (if (< nbs death-limit)
+          0
+          1)
+        (if (> nbs birth-limit)
+          1
+          0))))
+
+(apply-rule [[1 0 0]
+             [0 0 1]
+             [1 0 0]]
+            [1 1]
+            0
+            1)
+
+(let [map1 [[1 0 0]
+            [0 0 1]
+            [1 0 0]]
+      death-limit 3]
+  (loop [new-map map1
+         coords (u/grid 3 3 1 1)]
+    (if (empty? coords)
+      new-map
+      (recur (assoc-in new-map
+                       (first coords)
+                       (apply-rule map1
+                                   (first coords)
+                                   0
+                                   1))
+             (rest coords)))))
