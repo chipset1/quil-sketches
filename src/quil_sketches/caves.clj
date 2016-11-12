@@ -60,10 +60,9 @@
              (rest coords)))))
 
 (defn generate-map
-  [steps width height chance-to-start-alive death-limit birth-limit]
-  (let [initial-map (cell-map width
-                              height
-                              chance-to-start-alive)]
+  [initial-map steps chance-to-start-alive death-limit birth-limit]
+  (let [width (count (first initial-map))
+        height (count initial-map)]
     (loop [s steps
            m (sim-step initial-map
                        width
