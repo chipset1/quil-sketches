@@ -24,10 +24,23 @@
         :when (not= 0 dx dy)]
     [(+ dx x) (+ dy y)]))
 
+(defn on-edge?
+  [grid coord]
+  (let [row (first coord)
+        col (second coord)
+        width (dec (count (first grid)))
+        height (dec (count grid))]
+    (or (= row 0)
+        (= row height)
+        (= col 0)
+        (= col width))))
+
 (defn count-neighbours
   [grid coord]
   (->> (neighbours coord)
-       (keep #(get-in grid %1))
+       (keep #(if (on-edge? grid coord)
+                1
+                (get-in grid %1)))
        (reduce +)))
 
 (defn apply-rule
@@ -74,7 +87,11 @@
         (recur (dec s)
                (sim-step m width height death-limit birth-limit))))))
 
-(def board (generate-map 6 50 50 0.4 3 4))
+(def board (generate-map (cell-map 50 50 0.45)
+                         10
+                         0.4
+                         3
+                         4))
 
 (defn draw []
   (let [cell-width 10
