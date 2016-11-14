@@ -44,16 +44,18 @@
        (reduce +)))
 
 (defn apply-rule
+  "cell is filled: empty it if it has less filled neighbours than the death-limt
+   cell is empty: fill it if its neighbours is less than the birthlimit"
   [cell-map coord death-limit birth-limit]
-  (let [cell (get-in cell-map coord)
-        nbs (count-neighbours cell-map coord)]
+ (let [cell (get-in cell-map coord)
+       nbs (count-neighbours cell-map coord)]
     (if (= cell 1)
-        (if (< nbs death-limit)
-          0
-          1)
-        (if (> nbs birth-limit)
-          1
-          0))))
+      (if (< nbs death-limit)
+        0
+        1)
+      (if (> nbs birth-limit)
+        1
+        0))))
 
 (defn sim-step
   [cell-map width height death-limit birth-limit]
@@ -73,9 +75,9 @@
              (rest coords)))))
 
 (defn generate-map
-  [initial-map steps chance-to-start-alive death-limit birth-limit]
-  (let [width (count (first initial-map))
-        height (count initial-map)]
+  [initial-map steps death-limit birth-limit]
+  (let [width (count initial-map)
+        height (count (first initial-map)) ]
     (loop [s steps
            m (sim-step initial-map
                        width
