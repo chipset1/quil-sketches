@@ -25,20 +25,20 @@
     [(+ dx x) (+ dy y)]))
 
 (defn on-edge?
-  [grid coord]
+  [cell-map coord]
   (let [row (first coord)
         col (second coord)
-        width (dec (count (first grid)))
-        height (dec (count grid))]
+        width (dec (count (first cell-map)))
+        height (dec (count cell-map))]
     (or (= row 0)
         (= row height)
         (= col 0)
         (= col width))))
 
 (defn alive-neighbours
-  [grid coord]
+  [cell-map coord]
   (->> (neighbours coord)
-       (keep #(get-in grid %1))
+       (keep #(get-in cell-map %1))
        (reduce +)))
 
 (defn apply-rule
