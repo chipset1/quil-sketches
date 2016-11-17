@@ -95,6 +95,12 @@
                          0.4
                          3
                          4))
+(def sketch-width 300)
+(def sketch-height 300)
+(def cell-size 5)
+(def board (cell-map (/ sketch-width cell-size)
+                     (/ sketch-height cell-size)
+                     0.46))
 
 (defn draw []
   (let [cell-width 10
@@ -113,7 +119,7 @@
                         board))))
 
 (q/defsketch quil-sketches
-  :size [500 500]
+  :size [sketch-width sketch-height]
   :draw draw
   :features [:keep-on-top]
   :middleware [m/pause-on-error])
