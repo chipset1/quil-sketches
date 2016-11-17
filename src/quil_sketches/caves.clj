@@ -35,20 +35,21 @@
         (= col 0)
         (= col width))))
 
-(defn count-neighbours
+(defn alive-neighbours
   [grid coord]
   (->> (neighbours coord)
-       (keep #(if (on-edge? grid coord)
-                1
-                (get-in grid %1)))
+       (keep #(get-in grid %1))
        (reduce +)))
 
 (defn apply-rule
-  "cell is filled: empty it if it has less filled neighbours than the death-limt
-   cell is empty: fill it if its neighbours is less than the birthlimit"
+  "if a cell is alive: empty it if it has less filled neighbours than the death-limt
+   cell is empty: fill it if its neighbours is less than the birthlimit
+  cells on edges have fixed neighbours to create a cave boundary "
   [cell-map coord death-limit birth-limit]
- (let [cell (get-in cell-map coord)
-       nbs (count-neighbours cell-map coord)]
+  (let [cell (get-in cell-map coord)
+        nbs (if (on-edge? cell-map coord)
+              5
+              (alive-neighbours cell-map coord))]
     (if (= cell 1)
       (if (< nbs death-limit)
         0
