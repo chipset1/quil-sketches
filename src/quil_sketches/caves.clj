@@ -48,83 +48,58 @@
        (keep #(get-in cell-map %1))
        (reduce +)))
 
-(defn apply-rule
+(defn survival-rule
   "if a cell is alive: empty it if it has less filled neighbours than the death-limt
    cell is empty: fill it if its neighbours is less than the birthlimit
   cells on edges have fixed neighbours to create a cave boundary "
-  [cell-map coord death-limit birth-limit]
-  (let [cell (get-in cell-map coord)
-        nbs (if (on-edge? cell-map coord)
-              5
-              (alive-neighbours cell-map coord))]
-    (if (= cell 1)
-      (if (< nbs death-limit)
-        0
-        1)
-      (if (> nbs birth-limit)
-        1
-        0))))
+  [birth-limit death-limit]
+  (fn [cell-map coord]
+    (let [cell (get-in cell-map coord)
+          nbs (if (on-edge? cell-map coord)
+                5
+                (alive-neighbours cell-map coord))]
+      (if (= cell 1)
+        (if (< nbs death-limit)
+          0
+          1)
+        (if (> nbs birth-limit)
+          1
+          0)))))
 
-(defn place-treasure
-  [cell-map coord limit]
-  (let [cell (get-in cell-map coord)
-        nbs (alive-neighbours cell-map coord)]
-    (if (and (= cell 0)
-             (>= nbs limit))
-      2
-      cell)))
-
-(defn sim-with-treasure
-  [cell-map width height treasure-limit]
-  (loop [new-cell-map cell-map
-         coords (u/grid width
-                        height
-                        1
-                        1)]
-    (if (empty? coords)
-      new-cell-map
-      (recur (assoc-in new-cell-map
-                       (first coords)
-                       (place-treasure cell-map
-                                       (first coords)
-                                       treasure-limit))
-             (rest coords)))))
+(defn treasure-rule
+  [limit]
+  (fn [cell-map coord]
+    (let [cell (get-in cell-map coord)
+          nbs (alive-neighbours cell-map coord)]
+      (if (and (= cell 0)
+               (>= nbs limit))
+        2
+        cell))))
 
 (defn simulation
-  [cell-map width height death-limit birth-limit]
-  (loop [new-cell-map cell-map
-         coords (u/grid width
-                        height
-                        1
-                        1)]
-    (if (empty? coords)
-      new-cell-map
-      (recur (assoc-in new-cell-map
-                       (first coords)
-                       (apply-rule cell-map
-                                   (first coords)
-                                   death-limit
-                                   birth-limit))
-             (rest coords)))))
+  [rule-fn cell-map]
+  (let [width (count cell-map)
+        height (count (first cell-map))]
+    (loop [new-cell-map cell-map
+          coords (u/grid width
+                         height
+                         1
+                         1)]
+     (if (empty? coords)
+       new-cell-map
+       (recur (assoc-in new-cell-map
+                        (first coords)
+                        (rule-fn cell-map (first coords)))
+              (rest coords))))))
 
 (defn generate-map
-  [initial-map steps death-limit birth-limit]
-  (let [width (count initial-map)
-        height (count (first initial-map))
-        sim (fn [m]
-              (simulation m
-                          width
-                          height
-                          death-limit
-                          birth-limit))]
-    (loop [s steps
-           m (sim initial-map)]
-      (if (= s 1)
-        m
-        (recur (dec s) (sim m))))))
-
-
-(def c1 (cell-map 10 10 0.5))
+  [rule-fn initial-map steps]
+  (loop [s steps
+         m (simulation rule-fn
+                       initial-map)]
+    (if (= s 1)
+      m
+      (recur (dec s) (simulation rule-fn m)))))
 
 (defn draw []
   (q/background (q/unhex "3355AA"))
