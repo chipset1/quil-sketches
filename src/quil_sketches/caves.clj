@@ -3,6 +3,16 @@
             [quil-sketches.util.core :as u]
             [quil.middleware :as m]))
 
+(declare cell-map)
+
+(def sketch-width 300)
+(def sketch-height 300)
+(def cell-size 5)
+(def board (cell-map (/ sketch-width cell-size)
+                     (/ sketch-height cell-size)
+                     0.46))
+
+
 (defn cell
   "return a new randomly set cell"
   [chance-to-start-alive]
@@ -17,7 +27,6 @@
                                            #(cell chance-to-start-alive)))))))
 
 (defn neighbours
-  "Determines all the neighbours of a given coordinate"
   [[x y]]
   (for [dx [-1 0 1]
         dy [-1 0 1]
@@ -25,10 +34,8 @@
     [(+ dx x) (+ dy y)]))
 
 (defn on-edge?
-  [cell-map coord]
-  (let [row (first coord)
-        col (second coord)
-        width (dec (count (first cell-map)))
+  [cell-map [row col]]
+  (let [width (dec (count (first cell-map)))
         height (dec (count cell-map))]
     (or (= row 0)
         (= row height)
@@ -58,7 +65,32 @@
         1
         0))))
 
-(defn sim-step
+(defn place-treasure
+  [cell-map coord limit]
+  (let [cell (get-in cell-map coord)
+        nbs (alive-neighbours cell-map coord)]
+    (if (and (= cell 0)
+             (>= nbs limit))
+      2
+      cell)))
+
+(defn sim-with-treasure
+  [cell-map width height treasure-limit]
+  (loop [new-cell-map cell-map
+         coords (u/grid width
+                        height
+                        1
+                        1)]
+    (if (empty? coords)
+      new-cell-map
+      (recur (assoc-in new-cell-map
+                       (first coords)
+                       (place-treasure cell-map
+                                       (first coords)
+                                       treasure-limit))
+             (rest coords)))))
+
+(defn simulation
   [cell-map width height death-limit birth-limit]
   (loop [new-cell-map cell-map
          coords (u/grid width
@@ -78,45 +110,46 @@
 (defn generate-map
   [initial-map steps death-limit birth-limit]
   (let [width (count initial-map)
-        height (count (first initial-map)) ]
+        height (count (first initial-map))
+        sim (fn [m]
+              (simulation m
+                          width
+                          height
+                          death-limit
+                          birth-limit))]
     (loop [s steps
-           m (sim-step initial-map
-                       width
-                       height
-                       death-limit
-                       birth-limit)]
+           m (sim initial-map)]
       (if (= s 1)
         m
-        (recur (dec s)
-               (sim-step m width height death-limit birth-limit))))))
+        (recur (dec s) (sim m))))))
 
-(def board (generate-map (cell-map 50 50 0.45)
-                         10
-                         0.4
-                         3
-                         4))
-(def sketch-width 300)
-(def sketch-height 300)
-(def cell-size 5)
-(def board (cell-map (/ sketch-width cell-size)
-                     (/ sketch-height cell-size)
-                     0.46))
+
+(def c1 (cell-map 10 10 0.5))
 
 (defn draw []
-  (let [cell-width 10
-        cell-height 10]
-    (q/background (q/unhex "3355AA"))
-    (doall (map-indexed (fn [i row]
-                          (doall (map-indexed (fn [j cell]
-                                                (when (= cell 1)
-                                                  (q/no-stroke)
-                                                  (q/fill 68,51,51)
-                                                  (q/rect (* i 10)
-                                                          (* j 10)
-                                                          10
-                                                          10)))
-                                              row)))
-                        board))))
+  (q/background (q/unhex "3355AA"))
+  (q/no-stroke)
+  (doall (map-indexed (fn [i row]
+                        (doall (map-indexed (fn [j cell]
+                                              (when (= cell 2)
+                                                (q/fill 0)
+                                                (q/rect (* j 10)
+                                                           (* i 10)
+                                                           10
+                                                           10))
+                                              (when (= cell 1)
+                                                (q/fill 68 51 51)
+                                                (q/rect (* j 10)
+                                                        (* i 10)
+                                                        10
+                                                        10)))
+                                            row)))
+                      (sim-with-treasure (simulation c1
+                                                     10 10
+                                                     3 4)
+                                         10
+                                         10
+                                         6))))
 
 (q/defsketch quil-sketches
   :size [sketch-width sketch-height]
