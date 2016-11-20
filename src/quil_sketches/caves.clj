@@ -23,7 +23,8 @@
   [width height chance-to-start-alive]
   (vec (repeatedly height
                    (fn [] (vec (repeatedly width
-                                           #(cell chance-to-start-alive)))))))
+
+                                           #(rand-cell chance-to-start-alive)))))))
 
 (defn neighbours
   [[x y]]
