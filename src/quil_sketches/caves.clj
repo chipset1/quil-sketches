@@ -12,9 +12,8 @@
                      (/ sketch-height cell-size)
                      0.46))
 
-
-(defn cell
-  "return a new randomly set cell"
+(defn rand-cell
+  "return an alive or dead cell based on "
   [chance-to-start-alive]
   (if (< (rand 1) chance-to-start-alive)
     1
@@ -45,7 +44,7 @@
 (defn alive-neighbours
   [cell-map coord]
   (->> (neighbours coord)
-       (keep #(get-in cell-map %1))
+       (keep #(get-in cell-map %))
        (reduce +)))
 
 (defn survival-rule
