@@ -101,33 +101,47 @@
       m
       (recur (dec s) (simulation rule-fn m)))))
 
-(defn draw []
+
+(defn setup []
+  {:cell-map (cell-map (/ sketch-width cell-size)
+                       (/ sketch-height cell-size)
+                       0.46)})
+
+(defn mouse-pressed
+  [old-state event]
+  {:cell-map (cell-map (/ sketch-width cell-size)
+                       (/ sketch-height cell-size)
+                       0.46)})
+
+(defn draw [state]
   (q/background (q/unhex "3355AA"))
   (q/no-stroke)
   (doall (map-indexed (fn [i row]
                         (doall (map-indexed (fn [j cell]
                                               (when (= cell 2)
-                                                (q/fill 0)
-                                                (q/rect (* j 10)
-                                                           (* i 10)
-                                                           10
-                                                           10))
+                                                (q/fill 241 212 55)
+                                                (q/rect (* j cell-size)
+                                                        (* i cell-size)
+                                                        cell-size
+                                                        cell-size))
                                               (when (= cell 1)
                                                 (q/fill 68 51 51)
-                                                (q/rect (* j 10)
-                                                        (* i 10)
-                                                        10
-                                                        10)))
+                                                (q/rect (* j cell-size)
+                                                        (* i cell-size)
+                                                        cell-size
+                                                        cell-size)))
                                             row)))
-                      (sim-with-treasure (simulation c1
-                                                     10 10
-                                                     3 4)
-                                         10
-                                         10
-                                         6))))
+                      (->> (generate-map (survival-rule 4 3)
+                                         (:cell-map state)
+                                         12)
+                           (simulation (treasure-rule 5))))))
+
 
 (q/defsketch quil-sketches
   :size [sketch-width sketch-height]
+  :setup setup
+  :mouse-pressed mouse-pressed
   :draw draw
   :features [:keep-on-top]
-  :middleware [m/pause-on-error])
+  :middleware [m/fun-mode
+               m/pause-on-error])
