@@ -12,8 +12,8 @@
    e.g (rand-cell 0.5)"
   [chance-to-start-alive]
   (if (< (rand 1) chance-to-start-alive)
-    1
-    0))
+    :alive
+    :dead))
 
 (defn cell-map
   [width height chance-to-start-alive]
@@ -41,7 +41,8 @@
   [cell-map coord]
   (->> (neighbours coord)
        (keep #(get-in cell-map %))
-       (reduce +)))
+       (filter (partial = :alive))
+       count))
 
 (defn survival-rule
   "If a cell is alive: kill it if it has less alive neighbours than the death-limit.
@@ -53,22 +54,22 @@
           nbs (if (on-edge? cell-map coord)
                 5
                 (alive-neighbours cell-map coord))]
-      (if (= cell 1)
+      (if (= cell :alive)
         (if (< nbs death-limit)
-          0
-          1)
+          :dead
+          :alive)
         (if (> nbs birth-limit)
-          1
-          0)))))
+          :alive
+          :dead)))))
 
 (defn treasure-rule
   [limit]
   (fn [cell-map coord]
     (let [cell (get-in cell-map coord)
           nbs (alive-neighbours cell-map coord)]
-      (if (and (= cell 0)
+      (if (and (= cell :dead)
                (>= nbs limit))
-        2
+        :treasure
         cell))))
 
 (defn simulation
@@ -103,20 +104,20 @@
   [old-state event]
   {:cell-map (cell-map (/ sketch-width cell-size)
                        (/ sketch-height cell-size)
-                       0.46)})
+                       0.36)})
 
 (defn draw [state]
   (q/background (q/unhex "3355AA"))
   (q/no-stroke)
   (doall (map-indexed (fn [i row]
                         (doall (map-indexed (fn [j cell]
-                                              (when (= cell 2)
+                                              (when (= cell :treasure)
                                                 (q/fill 241 212 55)
                                                 (q/rect (* j cell-size)
                                                         (* i cell-size)
                                                         cell-size
                                                         cell-size))
-                                              (when (= cell 1)
+                                              (when (= cell :alive)
                                                 (q/fill 68 51 51)
                                                 (q/rect (* j cell-size)
                                                         (* i cell-size)
