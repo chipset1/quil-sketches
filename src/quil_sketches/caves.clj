@@ -3,17 +3,13 @@
             [quil-sketches.util.core :as u]
             [quil.middleware :as m]))
 
-(declare cell-map)
-
-(def sketch-width 300)
-(def sketch-height 300)
-(def cell-size 5)
-(def board (cell-map (/ sketch-width cell-size)
-                     (/ sketch-height cell-size)
-                     0.46))
+(def sketch-width 500)
+(def sketch-height 500)
+(def cell-size 10)
 
 (defn rand-cell
-  "return an alive or dead cell based on "
+  "return dead cell (0) or an alive cell (1) based on a chance percentage from 0.0 - 1.0
+   e.g (rand-cell 0.5)"
   [chance-to-start-alive]
   (if (< (rand 1) chance-to-start-alive)
     1
@@ -49,9 +45,9 @@
        (reduce +)))
 
 (defn survival-rule
-  "if a cell is alive: empty it if it has less filled neighbours than the death-limt
-   cell is empty: fill it if its neighbours is less than the birthlimit
-  cells on edges have fixed neighbours to create a cave boundary "
+  "If a cell is alive: kill it if it has less alive neighbours than the death-limt.
+   If a cell is dead:  make it alive if its alive neighbours is greater than the birthlimit.
+   Cells on the edges have fixed neighbours to create a solid boundary around cave "
   [birth-limit death-limit]
   (fn [cell-map coord]
     (let [cell (get-in cell-map coord)
