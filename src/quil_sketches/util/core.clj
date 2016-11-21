@@ -40,11 +40,17 @@
   (repeatedly #(random min max)))
 
 (defn grid
+  "Returns list of positions (indices, coordinates) of a 2D array
+  e.g (grid 3 3) => ([0 0] [0 1] [0 2]
+                     [1 0] [1 1] [1 2]
+                     [2 0] [2 1] [2 2])"
+  ([w h]
+   (grid 0 0 w h 1 1))
   ([w h sx sy]
    (grid 0 0 w h sx sy))
-  ([sx sy w h step-x step-y]
-   (for [x (range sx w step-x)
-         y (range sy h step-y)]
+  ([start-x start-y w h step-x step-y]
+   (for [x (range start-x w step-x)
+         y (range start-y h step-y)]
      [x y])))
 
 (defn random-grid

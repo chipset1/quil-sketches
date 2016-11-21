@@ -76,10 +76,7 @@
   (let [width (count cell-map)
         height (count (first cell-map))]
     (loop [new-cell-map cell-map
-          coords (u/grid width
-                         height
-                         1
-                         1)]
+           coords (u/grid width height)]
      (if (empty? coords)
        new-cell-map
        (recur (assoc-in new-cell-map
