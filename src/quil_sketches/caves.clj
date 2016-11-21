@@ -125,7 +125,7 @@
                                             row)))
                       (->> (generate-map (survival-rule 4 3)
                                          (:cell-map state)
-                                         12)
+                                         6)
                            (simulation (treasure-rule 5))))))
 
 
