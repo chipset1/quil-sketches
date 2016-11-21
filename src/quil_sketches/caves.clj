@@ -19,7 +19,6 @@
   [width height chance-to-start-alive]
   (vec (repeatedly height
                    (fn [] (vec (repeatedly width
-
                                            #(rand-cell chance-to-start-alive)))))))
 
 (defn neighbours
@@ -45,9 +44,9 @@
        (reduce +)))
 
 (defn survival-rule
-  "If a cell is alive: kill it if it has less alive neighbours than the death-limt.
-   If a cell is dead:  make it alive if its alive neighbours is greater than the birthlimit.
-   Cells on the edges have fixed neighbours to create a solid boundary around cave "
+  "If a cell is alive: kill it if it has less alive neighbours than the death-limit.
+   If a cell is dead: make it alive if its alive eighbours is greater than the birthlimit.
+   Cells on edges have fixed neighbours to create a solid boundary around cave"
   [birth-limit death-limit]
   (fn [cell-map coord]
     (let [cell (get-in cell-map coord)
