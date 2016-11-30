@@ -6,6 +6,7 @@
 (def sketch-width 500)
 (def sketch-height 500)
 (def cell-size 10)
+(def cell-size 5)
 
 (defn rand-cell
   "return dead cell (0) or an alive cell (1) based on a chance percentage from 0.0 - 1.0
@@ -105,6 +106,7 @@
   {:cell-map (cell-map (/ sketch-width cell-size)
                        (/ sketch-height cell-size)
                        0.36)})
+                       0.46)})
 
 (defn draw [state]
   (q/background (q/unhex "3355AA"))
