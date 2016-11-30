@@ -1,11 +1,11 @@
 (ns quil-sketches.caves
+  "Based on https://gamedevelopment.tutsplus.com/tutorials/generate-random-cave-levels-using-cellular-automata--gamedev-9664"
   (:require [quil.core :as q]
             [quil-sketches.util.core :as u]
             [quil.middleware :as m]))
 
 (def sketch-width 500)
 (def sketch-height 500)
-(def cell-size 10)
 (def cell-size 5)
 
 (defn rand-cell
@@ -126,7 +126,7 @@
                                                         cell-size
                                                         cell-size)))
                                             row)))
-                      (->> (generate-map (survival-rule 4 3)
+                      (->> (generate-map (survival-rule 4 4) ;; change these values to affect cave gen
                                          (:cell-map state)
                                          6)
                            (simulation (treasure-rule 5))))))
