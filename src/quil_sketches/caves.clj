@@ -105,7 +105,6 @@
   [old-state event]
   {:cell-map (cell-map (/ sketch-width cell-size)
                        (/ sketch-height cell-size)
-                       0.36)})
                        0.46)})
 
 (defn draw [state]
